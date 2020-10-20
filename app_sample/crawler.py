@@ -2,18 +2,67 @@
 import requests
 import re
 # 浏览一个网页
-url = 'http://www.biquge.info/1_1173/'
-# 模拟浏览器发出请求
+from bs4 import BeautifulSoup
+
+url = 'https://news.whu.edu.cn/wdyw.htm'
+# 模拟浏览器发出http请求
 response = requests.get(url)
 # 编码方式
-response.encoding = 'UTF-8'
-# 目标小说网页源码
+response.encoding = 'utf-8'
+# 网页源码
 html = response.text
-# 小说名称
-title = re.findall(r'<meta property="og:novel:book_name" content="(.*?)"/>',html)[0]
-# 新建文件夹，保存小说内容
+soup = BeautifulSoup(html,"html.parser")
+list_content = soup.find("div","list")
+# print(list_content)
+# 提取每一条新闻内容
+div = re.findall(r'<div class="list" style="height: 270px">.*?</div>',html,re.S)
+list_obj = list_content.find_all("li")
+list_obj.remove(list_obj[0])
+news_info_list = []
+for x in list_obj:
+    news_info = re.findall(r'<a class="gray" href="(.*?)" title="(.*?)">', str(x))[0]
+    news_info_list.append(news_info)
+    s = (news)
+    news_info_list.append(s)
+print(news_info_list)
+print(len(news_info_list))
 
-# 获取小说每一章信息
-dl = re.findall(r'<div id="list">.*?</dl>',html,re.S)[0]
-chapter_info_list = re.findall(r'<dd><a href="(.*?)" title="(.*?)">(.*?)</a></dd>',dl)
-
+# news_info_list = []
+# pagenum = 1
+# error = []
+# def getOnePage(url):
+#     if url:
+#         response = requests.get(url)
+#         # 编码方式
+#         response.encoding = 'utf-8'
+#         # 网页源码
+#         html = response.text
+#         soup = BeautifulSoup(html, "html.parser")
+#         list_content = soup.find("div", "list")
+#         # print(list_content)
+#         # 提取每一条新闻内容
+#         list_obj = list_content.find_all("li")
+#         list_obj.remove(list_obj[0])
+#         for x in list_obj:
+#             try:
+#                 news_info = re.findall(r'<a class="gray" href="(.*?)" title="(.*?)">', str(x))[0]
+#                 news_info_list.append(news_info)
+#             except:
+#                 error.append(str(x))
+#                 continue
+#         print(len(news_info_list))
+#         next_page_url = re.findall(r'上页</a><a href="(.*?).htm" class="Next">下页</a>', html)
+#         if next_page_url:
+#             # <a href="441.htm" class="Next">下页</a>
+#             print(next_page_url)
+#             print("https://news.whu.edu.cn/wdyw/" + str(next_page_url[0])+".htm")
+#             return getOnePage("https://news.whu.edu.cn/wdyw/" + str(next_page_url[0])+".htm")
+#
+#
+#
+# getOnePage(url)
+#
+# print(error)
+# print(len(error))
+# print("final result:",len(news_info_list))
+# print(len(set(news_info_list)))
